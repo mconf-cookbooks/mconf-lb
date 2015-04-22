@@ -20,44 +20,6 @@ package 'libgeoip-dev'
 package 'libexpat1-dev'
 package 'redis-server'
 
-# Install MySQL Server
-mysql_service 'default' do
-  version '5.5'
-  port '3306'
-  bind_address '0.0.0.0'
-  initial_root_password node['db']['passwords']['root']
-  action :create
-end
-
-mysql2_chef_gem 'default' do
-  action :install
-end
-
-# Configure a user and a database for our app
-connection_info = {
-  :host     => 'localhost',
-  :username => 'root',
-  :password => node['db']['passwords']['root']
-}
-
-mysql_database_user node['db']['user'] do
-  connection connection_info
-  password   node['db']['passwords']['app']
-  action     :create
-end
-
-mysql_database node['db']['name'] do
-  connection connection_info
-  action :create
-end
-
-mysql_database_user node['db']['user'] do
-  connection    connection_info
-  database_name node['db']['name']
-  privileges    [:all]
-  action        :grant
-end
-
 # Node.js
 include_recipe "nodejs"
 include_recipe "nodejs::npm"
