@@ -25,8 +25,8 @@ package 'redis-server'
 # (Just the directory, capistrano does the rest)
 
 directory node['mconf-lb']['deploy_to'] do
-  owner 'root'
-  group 'root'
+  owner node['mconf']['user']
+  group node['mconf']['app_group']
   mode '0755'
   recursive true
   action :create
