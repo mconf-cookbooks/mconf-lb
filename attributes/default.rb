@@ -34,3 +34,22 @@ default['mconf-lb']['monit']['smtp']['port'] = 587
 default['mconf-lb']['monit']['smtp']['username'] = 'username'
 default['mconf-lb']['monit']['smtp']['password'] = 'password'
 default['mconf-lb']['monit']['smtp']['timeout'] = 30
+
+# Heartbeat
+default['heartbeat']['enable'] = false
+default['heartbeat']['config']['autojoin'] = 'none'
+default['heartbeat']['config']['deadtime'] = 15
+default['heartbeat']['config']['initdead'] = 60
+default['heartbeat']['config']['keepalive'] = 2
+default['heartbeat']['config']['udpport'] = 694
+default['heartbeat']['config']['warntime'] = 5
+default['heartbeat']['config']['authkeys'] = []
+default['heartbeat']['config']['active_key'] = 1
+default['heartbeat']['config']['mode'] = :mcast
+default['heartbeat']['config']['interface'] = ['eth0.5']
+default['heartbeat']['config']['mcast_group'] = '225.0.0.1'
+default['heartbeat']['config']['mcast_ttl'] = 1
+default['heartbeat']['config']['resource_ip'] = 'IPaddr2::192.168.0.0/24/eth0.5/192.168.1.1'
+
+# respawn hacluster /usr/lib/heartbeat/ipfail
+# apiauth ipfail gid=haclient uid=hacluster

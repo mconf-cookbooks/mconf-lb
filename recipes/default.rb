@@ -138,5 +138,9 @@ template "/etc/logrotate.d/mconf-lb" do
   owner "root"
   group "root"
 end
-
 execute "logrotate -s /var/lib/logrotate/status /etc/logrotate.d/mconf-lb"
+
+# Heartbeat
+if node['heartbeat']['enable']
+  include_recipe "heartbeat::config"
+end

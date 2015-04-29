@@ -19,5 +19,7 @@ depends          "database", "~> 4.0"
 depends          "nodejs"
 depends          "ohai"
 depends          "nginx"
+depends          "build-essential"
+depends          "heartbeat", "~> 1.0.0"
 
 recipe "mconf-lb::default", "Sets up an instance of Mconf LB"
