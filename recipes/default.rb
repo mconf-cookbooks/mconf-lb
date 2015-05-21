@@ -54,6 +54,8 @@ end
 
 # Nginx installation
 
+# TODO: it is apparently always compiling and restarting nginx, shouldn't do it
+# all the time
 include_recipe "nginx"
 service "nginx"
 
@@ -101,6 +103,7 @@ execute "nxensite mconf-lb" do
   notifies :restart, "service[nginx]", :delayed
 end
 
+
 # Upstart
 template "/etc/init/mconf-lb.conf" do
   source "upstart-script.conf.erb"
@@ -108,6 +111,7 @@ template "/etc/init/mconf-lb.conf" do
   owner "root"
   group "root"
 end
+
 
 # Monit
 # TODO: can we set an specific version?
@@ -147,7 +151,32 @@ execute "logrotate -s /var/lib/logrotate/status /etc/logrotate.d/mconf-lb"
 
 # Heartbeat
 if node['heartbeat']['enable']
-  include_recipe "heartbeat::config"
+  include_recipe "heartbeat"
+
+  resource_grp = ::Chef::Resource::HeartbeatResourceGroup.new(run_context, cookbook_name, recipe_name)
+  resource_grp.ipaddr node['heartbeat']['config']['resource_ip']
+  resource_grp.default_node node['heartbeat']['config']['default_node']
+  heartbeat "heartbeat" do
+    auto_failback node['heartbeat']['config']['auto_failback']
+    autojoin node['heartbeat']['config']['autojoin']
+    compression node['heartbeat']['config']['compression']
+    compression_threshold node['heartbeat']['config']['compression_threshold']
+    deadtime node['heartbeat']['config']['deadtime']
+    initdead node['heartbeat']['config']['initdead']
+    keepalive node['heartbeat']['config']['keepalive']
+    logfacility node['heartbeat']['config']['logfacility']
+    udpport node['heartbeat']['config']['udpport']
+    warntime node['heartbeat']['config']['warntime']
+    search node['heartbeat']['config']['search']
+    authkeys node['heartbeat']['config']['authkeys']
+    active_key node['heartbeat']['config']['active_key']
+    mode node['heartbeat']['config']['mode']
+    interface node['heartbeat']['config']['interface']
+    mcast_group node['heartbeat']['config']['mcast_group']
+    mcast_ttl node['heartbeat']['config']['mcast_ttl']
+    resource_groups [resource_grp]
+    nodes node['heartbeat']['config']['nodes']
+  end
 
   # Monit configs for heartbeat
   template '/etc/monit/conf.d/mconf-lb-pid' do
