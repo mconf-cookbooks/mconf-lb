@@ -1,0 +1,11 @@
+#!monit
+
+# Monitors HeartBeat
+# Will check the pid file every interval
+# Will stop/start when the LB stops/starts
+# Expects the cycle interval to be set to 1 second.
+
+check process heartbeat with pidfile "/var/run/heartbeat.pid"
+    start program = "/etc/init.d/heartbeat start"
+    stop program = "/etc/init.d/heartbeat stop"
+    depends on mconf-lb-pid

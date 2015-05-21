@@ -115,10 +115,13 @@ package "monit"
 service "monit"
 
 template "/etc/monit/conf.d/mconf-lb" do
-  source "monit-config.erb"
+  source "monit-mconflb.erb"
   mode 00644
   owner "root"
   group "root"
+  variables(
+    cycle_multiplier: node['heartbeat']['enable'] ? 60 : 1
+  )
   notifies :restart, "service[monit]", :delayed
 end
 
@@ -130,6 +133,7 @@ template "/etc/monit/monitrc" do
   notifies :restart, "service[monit]", :delayed
 end
 
+
 # logrotate
 # TODO: use logrotate_app to configure this logrotate
 template "/etc/logrotate.d/mconf-lb" do
@@ -140,7 +144,25 @@ template "/etc/logrotate.d/mconf-lb" do
 end
 execute "logrotate -s /var/lib/logrotate/status /etc/logrotate.d/mconf-lb"
 
+
 # Heartbeat
 if node['heartbeat']['enable']
   include_recipe "heartbeat::config"
+
+  # Monit configs for heartbeat
+  template '/etc/monit/conf.d/mconf-lb-pid' do
+    source 'monit-mconflbpid.erb'
+    mode 00644
+    owner 'root'
+    group 'root'
+    notifies :restart, "service[monit]", :delayed
+  end
+
+  template '/etc/monit/conf.d/mconf-lb-heartbeat' do
+    source 'monit-heartbeat.erb'
+    mode 00644
+    owner 'root'
+    group 'root'
+    notifies :restart, "service[monit]", :delayed
+  end
 end

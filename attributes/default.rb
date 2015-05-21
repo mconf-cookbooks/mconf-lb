@@ -53,3 +53,8 @@ default['heartbeat']['config']['resource_ip'] = 'IPaddr2::192.168.0.0/24/eth0.5/
 
 # respawn hacluster /usr/lib/heartbeat/ipfail
 # apiauth ipfail gid=haclient uid=hacluster
+
+# If heartbeat is enabled we monitor it using the smallest interval possible
+if default['heartbeat']['enable']
+  default['mconf-lb']['monit']['interval'] = 1
+end

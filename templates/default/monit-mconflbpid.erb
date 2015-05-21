@@ -1,0 +1,9 @@
+#!monit
+
+# Monitors the Load Balancer
+# Will check the pid file every interval
+# Expects the cycle interval to be set to 1 second.
+
+check process mconf-lb-pid with pidfile "/var/run/mconf-lb.pid"
+    start program = "/sbin/start mconf-lb"
+    stop program = "/sbin/stop mconf-lb"
