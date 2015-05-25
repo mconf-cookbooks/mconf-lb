@@ -6,7 +6,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
 
-override["build_essential"]["compiletime"] = false
+override['build-essential']['compile_time'] = false
 override["nodejs"]["install_method"] = "source"
 override["nodejs"]["version"] = "0.8.25"
 override["nodejs"]["npm"] = "1.3.7"
