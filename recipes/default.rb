@@ -14,11 +14,9 @@ execute "apt-get update"
 
 include_recipe "build-essential"
 
-package 'git'
-package 'libssl-dev'
-package 'libgeoip-dev'
-package 'libexpat1-dev'
-package 'redis-server'
+%w{git libssl-dev libgeoip-dev libexpat1-dev}.each do |pkg|
+  package pkg
+end
 
 
 # Create the app directory
