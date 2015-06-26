@@ -7,8 +7,8 @@
 #
 
 # User and group on the server the application is being deployed
-default['mconf-lb']['user'] = 'mconf'
-default['mconf-lb']['app_group'] = 'www-data'
+default['mconf-lb']['user'] = node['mconf']['user']
+default['mconf-lb']['app_group'] = node['mconf']['app_group']
 
 # LB general configurations
 default['mconf-lb']['domain'] = '192.168.0.100'
