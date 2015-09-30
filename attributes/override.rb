@@ -9,7 +9,8 @@
 override['build-essential']['compile_time'] = false
 override["nodejs"]["install_method"] = "source"
 override["nodejs"]["version"] = "0.8.25"
-override["nodejs"]["npm"] = "1.3.7"
+override["nodejs"]["npm"]["install_method"] = "source" # otherwise we can't set the version
+override["nodejs"]["npm"]["version"] = "1.3.7"
 
 # Install from source because we need a newer version
 nginx_version = "1.6.0"
