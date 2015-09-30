@@ -7,11 +7,11 @@
 #
 
 # User and group on the server the application is being deployed
-default['mconf-lb']['user'] = node['mconf']['user']
-default['mconf-lb']['app_group'] = node['mconf']['app_group']
+default['mconf-lb']['user']      = node['mconf']['user'] || 'mconf'
+default['mconf-lb']['app_group'] = node['mconf']['app_group'] || 'mconf'
 
 # LB general configurations
-default['mconf-lb']['domain'] = '192.168.0.100'
+default['mconf-lb']['domain']    = '192.168.0.100'
 default['mconf-lb']['deploy_to'] = '/var/www/mconf-lb'
 
 # Used for monit's "set daemon"
