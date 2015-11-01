@@ -62,7 +62,7 @@ set mailserver <%= node['mconf-lb']['monit']['smtp']['server'] %>
                username "<%= node['mconf-lb']['monit']['smtp']['username'] %>"
                password "<%= node['mconf-lb']['monit']['smtp']['password'] %>"
                using tlsv1
-               with timeout <%= node['mconf-lb']['smtp']['timeout'] %> seconds
+               with timeout <%= node['mconf-lb']['monit']['smtp']['timeout'] %> seconds
 
 set mail-format {
       from: <%= node['mconf-lb']['monit']['alert_from'] %>
