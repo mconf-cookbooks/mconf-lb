@@ -34,6 +34,9 @@ default['mconf-lb']['monit']['smtp']['port'] = 587
 default['mconf-lb']['monit']['smtp']['username'] = 'username'
 default['mconf-lb']['monit']['smtp']['password'] = 'password'
 default['mconf-lb']['monit']['smtp']['timeout'] = 30
+# Stops monitoring after this number of consecutive restarts. Set to 0 to disable
+# (will never stop trying).
+default['mconf-lb']['monit']['abort_on_restarts'] = 0
 
 # Heartbeat
 default['mconf-lb']['heartbeat']['enable'] = false

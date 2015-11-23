@@ -122,7 +122,8 @@ template "/etc/monit/conf.d/mconf-lb" do
   owner "root"
   group "root"
   variables(
-    cycle_multiplier: node['mconf-lb']['heartbeat']['enable'] ? 60 : 1
+    cycle_multiplier: node['mconf-lb']['heartbeat']['enable'] ? 60 : 1,
+    abort_on_restarts: node['mconf-lb']['monit']['abort_on_restarts']
   )
   notifies :restart, "service[monit]", :delayed
 end
