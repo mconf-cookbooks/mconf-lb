@@ -15,25 +15,37 @@ default['mconf-lb']['domain']    = '192.168.0.100'
 default['mconf-lb']['deploy_to'] = '/var/www/mconf-lb'
 
 # Used for monit's "set daemon"
-default['mconf-lb']['monit']['interval'] = 60 # in seconds
-
+default['mconf-lb']['monit']['interval']          = 30 # in seconds
 # Disable alerts by default
-default['mconf-lb']['monit']['enable_alerts'] = false
-# Email alerts will be sent with this email as the sender
-default['mconf-lb']['monit']['alert_from'] = 'support@foo'
-# You can use a single email, an array of emails, or even strings with more parameters, as will be
-# passed to monit's "set alert" (see https://mmonit.com/monit/documentation/monit.html).
-# Examples:
-#   'foo@bar'
-#   'foo@bar only on { timeout, nonexist }'
-#   ['baz@bar', 'foo@bar only on { timeout, nonexist }']
-default['mconf-lb']['monit']['alert_to'] = 'issues@foo'
+default['mconf-lb']['monit']['enable_alerts']     = false
+# You can set it to a single string with an email, that will receive all events,
+# or set to an object (or an array of objects) with the format:
+#
+# [
+#   {
+#     "name": "root@localhost",
+#     "but_not_on": [ "nonexist" ]
+#   },
+#   {
+#     "name": "netadmin@localhost",
+#     "only_on": [ "nonexist", "timeout", "icmp", "connection"]
+#   },
+#   {
+#     "name": "iwantall@localhost"
+#   }
+# ]
+#
+# See Monit's documentation for "set alert" at
+# https://mmonit.com/monit/documentation/monit.html).
+default['mconf-lb']['monit']['alert_to']          = 'issues@foo'
+default['mconf-lb']['monit']['alert_from']        = 'support@foo'
 # SMTP configurations
-default['mconf-lb']['monit']['smtp']['server'] = 'smtp.foo'
-default['mconf-lb']['monit']['smtp']['port'] = 587
-default['mconf-lb']['monit']['smtp']['username'] = 'username'
-default['mconf-lb']['monit']['smtp']['password'] = 'password'
-default['mconf-lb']['monit']['smtp']['timeout'] = 30
+default['mconf-lb']['monit']['smtp']['server']    = 'smtp.foo'
+default['mconf-lb']['monit']['smtp']['port']      = 587
+default['mconf-lb']['monit']['smtp']['username']  = 'username'
+default['mconf-lb']['monit']['smtp']['password']  = 'password'
+default['mconf-lb']['monit']['smtp']['timeout']   = '30 seconds'
+default['mconf-lb']['monit']['smtp']['security']  = 'TLSV1'
 # Stops monitoring after this number of consecutive restarts. Set to 0 to disable
 # (will never stop trying).
 default['mconf-lb']['monit']['abort_on_restarts'] = 0

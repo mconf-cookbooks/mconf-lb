@@ -29,3 +29,52 @@ override['nginx']['source']['default_configure_flags'] = %W(
   --conf-path=#{node['nginx']['dir']}/nginx.conf
   --sbin-path=#{node['nginx']['source']['sbin_path']}
 )
+
+
+# Default options for monit.
+# Most of the paths and options here are copied from the defaults in the Ubuntu packages.
+override["monit"]["init_style"]             = "upstart"
+override["monit"]["config"]["poll_freq"]    = node['mconf-lb']['monit']['interval']
+override["monit"]["config"]['start_delay']  = 2
+override["monit"]["config"]['mail_subject'] = '$SERVICE ($ACTION) $EVENT at $DATE'
+override["monit"]["config"]['mail_message'] = <<-EOT
+Event:\t\t\t $EVENT
+Host:\t\t\t $HOST
+Service:\t\t $SERVICE
+Date:\t\t\t $DATE
+Action:\t\t\t $ACTION
+Description:\t\t $DESCRIPTION
+
+Your faithful employee,
+Monit
+EOT
+
+if node['mconf-lb']['monit']['enable_alerts']
+  override["monit"]["config"]['mail_from'] = node['mconf-lb']['monit']['alert_from']
+
+  override["monit"]["config"]["mail_servers"] = [
+    {
+      "hostname" => node['mconf-lb']['monit']['smtp']['server'],
+      "port" => node['mconf-lb']['monit']['smtp']['port'],
+      "username" => node['mconf-lb']['monit']['smtp']['username'],
+      "password" => node['mconf-lb']['monit']['smtp']['password'],
+      "security" => node['mconf-lb']['monit']['smtp']['security'],
+      "timeout" => node['mconf-lb']['monit']['smtp']['timeout']
+    }
+  ]
+
+  if node['mconf-lb']['monit']['alert_to'].kind_of?(Array)
+    alerts = node['mconf-lb']['monit']['alert_to']
+  elsif node['mconf-lb']['monit']['alert_to'].kind_of?(String)
+    alerts = [
+      {
+        "name" => node['mconf-lb']['monit']['alert_to']
+      }
+    ]
+  else
+    alerts = [
+      node['mconf-lb']['monit']['alert_to']
+    ]
+  end
+  override["monit"]["config"]["alert"] = alerts
+end

@@ -112,12 +112,10 @@ end
 
 
 # Monit
-# TODO: can we set an specific version?
-package "monit"
-service "monit"
+include_recipe "monit-ng"
 
-template "/etc/monit/conf.d/mconf-lb" do
-  source "monit-mconflb.erb"
+template "#{node["monit"]["conf_dir"]}/mconf-lb.conf" do
+  source "mconf-lb.monitrc.erb"
   mode 00644
   owner "root"
   group "root"
@@ -127,15 +125,6 @@ template "/etc/monit/conf.d/mconf-lb" do
   )
   notifies :restart, "service[monit]", :delayed
 end
-
-template "/etc/monit/monitrc" do
-  source "monitrc.erb"
-  mode 00600
-  owner "root"
-  group "root"
-  notifies :restart, "service[monit]", :delayed
-end
-
 
 # logrotate
 # TODO: use logrotate_app to configure this logrotate
@@ -178,16 +167,16 @@ if node['mconf-lb']['heartbeat']['enable']
   end
 
   # Monit configs for heartbeat
-  template '/etc/monit/conf.d/mconf-lb-pid' do
-    source 'monit-mconflbpid.erb'
+  template "#{node["monit"]["conf_dir"]}/mconf-lb-pid.conf" do
+    source "mconf-lb-pid.monitrc.erb"
     mode 00644
     owner 'root'
     group 'root'
     notifies :restart, "service[monit]", :delayed
   end
 
-  template '/etc/monit/conf.d/mconf-lb-heartbeat' do
-    source 'monit-heartbeat.erb'
+  template "#{node["monit"]["conf_dir"]}/mconf-lb-heartbeat.conf" do
+    source "mconf-lb-heartbeat.monitrc.erb"
     mode 00644
     owner 'root'
     group 'root'
