@@ -77,12 +77,9 @@ directory "/etc/nginx/includes" do
   action :create
 end
 
-cookbook_file "/etc/nginx/includes/mconf-lb-proxy.conf" do
-  source "nginx-include.conf"
-  mode 00644
-  owner "root"
-  group "root"
-  notifies :restart, "service[nginx]", :delayed
+# remove the old include file, if it exists
+file "/etc/nginx/includes/mconf-lb-proxy.conf" do
+  action :delete
 end
 
 template "/etc/nginx/sites-available/mconf-lb" do
@@ -91,7 +88,8 @@ template "/etc/nginx/sites-available/mconf-lb" do
   owner "root"
   group "root"
   variables({
-    :domain => node["mconf-lb"]["domain"]
+    domain: node["mconf-lb"]["domain"],
+    deploy_to: node["mconf-lb"]["deploy_to"]
   })
   notifies :restart, "service[nginx]", :delayed
 end
