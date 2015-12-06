@@ -112,6 +112,10 @@ end
 # Monit
 include_recipe "monit-ng"
 
+# remove the old file first to prevent conflicts
+file "#{node["monit"]["conf_dir"]}/mconf-lb" do
+  action :delete
+end
 template "#{node["monit"]["conf_dir"]}/mconf-lb.conf" do
   source "mconf-lb.monitrc.erb"
   mode 00644
