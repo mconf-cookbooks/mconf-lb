@@ -35,7 +35,7 @@ override['nginx']['source']['default_configure_flags'] = %W(
 # Most of the paths and options here are copied from the defaults in the Ubuntu packages.
 override["monit"]["init_style"]             = "upstart"
 override["monit"]["config"]["poll_freq"]    = node['mconf-lb']['monit']['interval']
-override["monit"]["config"]['start_delay']  = 2
+override["monit"]["config"]['start_delay']  = node['mconf-lb']['monit']['start_delay']
 override["monit"]["config"]['mail_subject'] = "#{node['mconf-lb']['domain']}: $ACTION $SERVICE ($DESCRIPTION)"
 # override["monit"]["config"]['mail_subject'] = "$SERVICE ($ACTION) $EVENT at $DATE"
 override["monit"]["config"]['mail_message'] = <<-EOT

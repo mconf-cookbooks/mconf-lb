@@ -14,8 +14,8 @@ default['mconf-lb']['app_group'] = node['mconf']['app_group'] || 'mconf'
 default['mconf-lb']['domain']    = '192.168.0.100'
 default['mconf-lb']['deploy_to'] = '/var/www/mconf-lb'
 
-# Used for monit's "set daemon"
-default['mconf-lb']['monit']['interval']          = 30 # in seconds
+default['mconf-lb']['monit']['interval']          = 30 # interval between checks, in seconds
+default['mconf-lb']['monit']['start_delay']       = 0 # in seconds
 # Disable alerts by default
 default['mconf-lb']['monit']['enable_alerts']     = false
 # You can set it to a single string with an email, that will receive all events,
