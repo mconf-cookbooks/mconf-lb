@@ -129,15 +129,15 @@ template "#{node["monit"]["conf_dir"]}/mconf-lb.conf" do
 end
 
 # logrotate
-# TODO: use logrotate_app to configure this logrotate
-template "/etc/logrotate.d/mconf-lb" do
-  source "logrotate-config.erb"
-  mode 00644
-  owner "root"
-  group "root"
+logrotate_app 'mconf-lb' do
+  cookbook 'logrotate'
+  path ["#{node['mconf-lb']['deploy_to_full']}/log/*.log"]
+  options ['missingok', 'compress', 'copytruncate', 'notifempty']
+  frequency node['mconf-lb']['logrotate']['frequency']
+  rotate node['mconf-lb']['logrotate']['rotate']
+  size node['mconf-lb']['logrotate']['size']
+  create "644 #{node['mconf-lb']['user']} #{node['mconf-lb']['app_group']}"
 end
-execute "logrotate -s /var/lib/logrotate/status /etc/logrotate.d/mconf-lb"
-
 
 # Heartbeat
 if node['mconf-lb']['heartbeat']['enable']

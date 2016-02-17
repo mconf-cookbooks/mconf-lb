@@ -13,7 +13,9 @@ default['mconf-lb']['app_group'] = node['mconf']['app_group'] || 'mconf'
 # LB general configurations
 default['mconf-lb']['domain']    = '192.168.0.100'
 default['mconf-lb']['deploy_to'] = '/var/www/mconf-lb'
+default['mconf-lb']['deploy_with_cap'] = true
 
+# Monit
 default['mconf-lb']['monit']['interval']          = 30 # interval between checks, in seconds
 default['mconf-lb']['monit']['start_delay']       = 0 # in seconds
 # Disable alerts by default
@@ -49,6 +51,12 @@ default['mconf-lb']['monit']['smtp']['security']  = 'TLSV1'
 # Stops monitoring after this number of consecutive restarts. Set to 0 to disable
 # (will never stop trying).
 default['mconf-lb']['monit']['abort_on_restarts'] = 0
+
+# logrotate options
+# by default keeps one log file per day, during ~4 months
+default['mconf-lb']['logrotate']['frequency'] = 'daily'
+default['mconf-lb']['logrotate']['rotate']    = 120
+default['mconf-lb']['logrotate']['size']      = nil
 
 # Heartbeat
 default['mconf-lb']['heartbeat']['enable'] = false
