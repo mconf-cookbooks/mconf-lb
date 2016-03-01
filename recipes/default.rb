@@ -99,6 +99,30 @@ execute "nxensite mconf-lb" do
   notifies :restart, "service[nginx]", :delayed
 end
 
+# logrotate for nginx (the cookbook doesn't configure it, we're not
+# overriding it)
+# this is mostly based on the config used by a newer version of the
+# cookbook nginx, see:
+# https://github.com/miketheman/nginx/blob/cdc31cd03606c5ae1914c7fbc93b2a7635647cd2/templates/default/nginx.logrotate.erb
+logrotate_app 'nginx' do
+  cookbook 'logrotate'
+  path ["#{node['nginx']['log_dir']}/*.log"]
+  options ['missingok', 'compress', 'copytruncate', 'notifempty', 'dateext']
+  frequency node['mconf-lb']['nginx']['logrotate']['frequency']
+  rotate node['mconf-lb']['nginx']['logrotate']['rotate']
+  size node['mconf-lb']['nginx']['logrotate']['size']
+  create "640 root root"
+  sharedscripts
+  prerotate <<-EOF
+    if [ -d /etc/logrotate.d/httpd-prerotate ]; then \\
+      run-parts /etc/logrotate.d/httpd-prerotate; \\
+    fi;
+  EOF
+  postrotate <<-EOF
+    [ ! -f #{node['nginx']['pid']} ] || kill -USR1 `cat #{node['nginx']['pid']}`
+  EOF
+end
+
 
 # Upstart
 template "/etc/init/mconf-lb.conf" do
@@ -132,7 +156,7 @@ end
 logrotate_app 'mconf-lb' do
   cookbook 'logrotate'
   path ["#{node['mconf-lb']['deploy_to_full']}/log/*.log"]
-  options ['missingok', 'compress', 'copytruncate', 'notifempty']
+  options ['missingok', 'compress', 'copytruncate', 'notifempty', 'dateext']
   frequency node['mconf-lb']['logrotate']['frequency']
   rotate node['mconf-lb']['logrotate']['rotate']
   size node['mconf-lb']['logrotate']['size']

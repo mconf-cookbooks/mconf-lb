@@ -26,6 +26,6 @@ depends  'nginx', '~> 2.7'
 depends  'build-essential', '2.0.6'
 depends  'heartbeat', '~> 1.0'
 depends  'monit-ng', '~> 2.1.0'
-depends  'logrotate', '1.1.0'
+depends  'logrotate', '~> 1.9'
 
 recipe 'mconf-lb::default', 'Sets up an instance of Mconf LB'

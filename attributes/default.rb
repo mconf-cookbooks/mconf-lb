@@ -53,10 +53,16 @@ default['mconf-lb']['monit']['smtp']['security']  = 'TLSV1'
 default['mconf-lb']['monit']['abort_on_restarts'] = 0
 
 # logrotate options
-# by default keeps one log file per day, during ~4 months
+# by default keeps one log file per day, during ~3 months
 default['mconf-lb']['logrotate']['frequency'] = 'daily'
-default['mconf-lb']['logrotate']['rotate']    = 120
+default['mconf-lb']['logrotate']['rotate']    = 90
 default['mconf-lb']['logrotate']['size']      = nil
+
+# logrotate options for nginx
+# by default keeps one log file per day, during ~3 months
+default['mconf-lb']['nginx']['logrotate']['frequency'] = 'daily'
+default['mconf-lb']['nginx']['logrotate']['rotate']    = 90
+default['mconf-lb']['nginx']['logrotate']['size']      = nil
 
 # Heartbeat
 default['mconf-lb']['heartbeat']['enable'] = false
