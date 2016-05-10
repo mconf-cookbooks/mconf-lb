@@ -19,6 +19,7 @@ include_recipe "build-essential"
 end
 
 
+
 # Create the app directory
 # (Just the directory, capistrano does the rest)
 
@@ -29,7 +30,6 @@ directory node['mconf-lb']['deploy_to'] do
   recursive true
   action :create
 end
-
 
 # Node.js
 include_recipe "nodejs"
@@ -49,8 +49,38 @@ execute "sudo rm -R /home/#{node["mconf-lb"]["user"]}/npmtmp" do
   not_if { !::File.exists?("/home/#{node["mconf-lb"]["user"]}/npmtmp") }
 end
 
-
 # Nginx installation
+#certificates
+if node['mconf-lb']['nginx']['ssl']['enable']
+#create the directory
+  directory "/etc/nginx/ssl" do
+    owner 'root'
+    group node['mconf-lb']['app-group']
+    mode 00640
+    recursive true
+    action :create
+  end
+#copy the certificates
+  certs = {
+    certificate_file: nil,
+    certificate_key_file: nil 
+  }
+  certs.each do |cert_name, value|
+    file = node['mconf-lb']['nginx']['ssl']['certificates'][cert_name] 
+    if file && file.strip != ''
+      path = "/etc/nginx/ssl/#{file}"
+      cookbook_file path do
+        source file
+        owner 'root'
+        group node['mconf-lb']['app-group']
+        mode 00640
+        action :create
+        notifies :restart, "service[nginx]", :delayed
+      end
+    end
+    certs[cert_name] = path
+  end
+end
 
 # TODO: it is apparently always compiling and restarting nginx, shouldn't do it
 # all the time
@@ -70,6 +100,8 @@ service "nginx"
 # include_recipe "nginx"
 
 # Nginx configurations
+
+
 directory "/etc/nginx/includes" do
   owner "root"
   group "root"
@@ -89,7 +121,8 @@ template "/etc/nginx/sites-available/mconf-lb" do
   group "root"
   variables({
     domain: node["mconf-lb"]["domain"],
-    deploy_to: node["mconf-lb"]["deploy_to"]
+    deploy_to: node["mconf-lb"]["deploy_to"],
+    ssl: node["mconf-lb"]['nginx']["ssl"]['enable']
   })
   notifies :restart, "service[nginx]", :delayed
 end
@@ -209,3 +242,5 @@ if node['mconf-lb']['heartbeat']['enable']
     notifies :restart, "service[monit]", :delayed
   end
 end
+
+
