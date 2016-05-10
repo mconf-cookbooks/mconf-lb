@@ -64,6 +64,11 @@ default['mconf-lb']['nginx']['logrotate']['frequency'] = 'daily'
 default['mconf-lb']['nginx']['logrotate']['rotate']    = 90
 default['mconf-lb']['nginx']['logrotate']['size']      = nil
 
+#ssl option for nginx
+default['mconf-lb']['nginx']['ssl']['enable'] = false
+default['mconf-lb']['nginx']['ssl']['certificates']['certificate_file'] = ''
+default['mconf-lb']['nginx']['ssl']['certificates']['certificate_key_file'] = ''
+
 # Heartbeat
 default['mconf-lb']['heartbeat']['enable'] = false
 default['mconf-lb']['heartbeat']['config']['autojoin'] = 'none'
