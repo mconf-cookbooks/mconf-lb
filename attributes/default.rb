@@ -15,6 +15,11 @@ default['mconf-lb']['domain']    = '192.168.0.100'
 default['mconf-lb']['deploy_to'] = '/var/www/mconf-lb'
 default['mconf-lb']['deploy_with_cap'] = true
 
+# SSL
+default['mconf-lb']['ssl']['enable'] = false
+default['mconf-lb']['ssl']['certificates']['certificate_file'] = ''
+default['mconf-lb']['ssl']['certificates']['certificate_key_file'] = ''
+
 # Monit
 default['mconf-lb']['monit']['interval']          = 30 # interval between checks, in seconds
 default['mconf-lb']['monit']['start_delay']       = 0 # in seconds
@@ -63,11 +68,6 @@ default['mconf-lb']['logrotate']['size']      = nil
 default['mconf-lb']['nginx']['logrotate']['frequency'] = 'daily'
 default['mconf-lb']['nginx']['logrotate']['rotate']    = 90
 default['mconf-lb']['nginx']['logrotate']['size']      = nil
-
-#ssl option for nginx
-default['mconf-lb']['nginx']['ssl']['enable'] = false
-default['mconf-lb']['nginx']['ssl']['certificates']['certificate_file'] = ''
-default['mconf-lb']['nginx']['ssl']['certificates']['certificate_key_file'] = ''
 
 # Heartbeat
 default['mconf-lb']['heartbeat']['enable'] = false
