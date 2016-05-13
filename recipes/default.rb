@@ -18,10 +18,8 @@ include_recipe "build-essential"
   package pkg
 end
 
-
 # Create the app directory
 # (Just the directory, capistrano does the rest)
-
 directory node['mconf-lb']['deploy_to'] do
   owner node['mconf-lb']['user']
   group node['mconf-lb']['app_group']
@@ -29,7 +27,6 @@ directory node['mconf-lb']['deploy_to'] do
   recursive true
   action :create
 end
-
 
 # Node.js
 include_recipe "nodejs"
@@ -49,8 +46,11 @@ execute "sudo rm -R /home/#{node["mconf-lb"]["user"]}/npmtmp" do
   not_if { !::File.exists?("/home/#{node["mconf-lb"]["user"]}/npmtmp") }
 end
 
-
-# Nginx installation
+# disable the site in nginx temporarily so it doesn't break the
+# rest of the installation if it's incorrect
+execute "nxdissite mconf-lb" do
+  ignore_failure true
+end
 
 # TODO: it is apparently always compiling and restarting nginx, shouldn't do it
 # all the time
@@ -69,7 +69,39 @@ service "nginx"
 # execute "apt-get update"
 # include_recipe "nginx"
 
-# Nginx configurations
+# Certificates for nginx
+if node['mconf-lb']['ssl']['enable']
+  directory "/etc/nginx/ssl" do
+    owner 'root'
+    group node['mconf-lb']['app-group']
+    mode 00640
+    recursive true
+    action :create
+  end
+
+  certs = {
+    certificate_file: nil,
+    certificate_key_file: nil
+  }
+  certs.each do |cert_name, value|
+    file = node['mconf-lb']['ssl']['certificates'][cert_name]
+    if file && file.strip != ''
+      path = "/etc/nginx/ssl/#{file}"
+      cookbook_file path do
+        source file
+        owner 'root'
+        group node['mconf-lb']['app-group']
+        mode 00640
+        action :create
+        notifies :restart, "service[nginx]", :delayed
+      end
+    end
+    certs[cert_name] = path
+  end
+
+  node.run_state['mconf-lb-certs'] = certs
+end
+
 directory "/etc/nginx/includes" do
   owner "root"
   group "root"
@@ -89,7 +121,9 @@ template "/etc/nginx/sites-available/mconf-lb" do
   group "root"
   variables({
     domain: node["mconf-lb"]["domain"],
-    deploy_to: node["mconf-lb"]["deploy_to"]
+    deploy_to: node["mconf-lb"]["deploy_to"],
+    ssl: node["mconf-lb"]["ssl"]["enable"],
+    certificates: node.run_state["mconf-lb-certs"]
   })
   notifies :restart, "service[nginx]", :delayed
 end

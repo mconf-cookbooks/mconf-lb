@@ -15,6 +15,11 @@ default['mconf-lb']['domain']    = '192.168.0.100'
 default['mconf-lb']['deploy_to'] = '/var/www/mconf-lb'
 default['mconf-lb']['deploy_with_cap'] = true
 
+# SSL
+default['mconf-lb']['ssl']['enable'] = false
+default['mconf-lb']['ssl']['certificates']['certificate_file'] = ''
+default['mconf-lb']['ssl']['certificates']['certificate_key_file'] = ''
+
 # Monit
 default['mconf-lb']['monit']['interval']          = 30 # interval between checks, in seconds
 default['mconf-lb']['monit']['start_delay']       = 0 # in seconds
