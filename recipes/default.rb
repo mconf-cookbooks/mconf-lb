@@ -98,14 +98,13 @@ if node['mconf-lb']['ssl']['enable']
     end
     certs[cert_name] = path
   end
-
   node.run_state['mconf-lb-certs'] = certs
-end
 
-# see https://gist.github.com/plentz/6737338
-dhp_2048_file = '/etc/nginx/ssl/dhp-2048.pem'
-execute "openssl dhparam -out #{dhp_2048_file} 2048" do
-  not_if { ::File.exists?(dhp_2048_file) }
+  # see https://gist.github.com/plentz/6737338
+  dhp_2048_file = '/etc/nginx/ssl/dhp-2048.pem'
+  execute "openssl dhparam -out #{dhp_2048_file} 2048" do
+    not_if { ::File.exists?(dhp_2048_file) }
+  end
 end
 
 directory "/etc/nginx/includes" do
