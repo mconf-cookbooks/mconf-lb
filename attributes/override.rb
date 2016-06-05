@@ -8,9 +8,9 @@
 
 override['build-essential']['compile_time'] = false
 override["nodejs"]["install_method"] = "source"
-override["nodejs"]["version"] = "0.8.25"
+override["nodejs"]["version"] = node["mconf-lb"]["node"]["version"]
 override["nodejs"]["npm"]["install_method"] = "source" # otherwise we can't set the version
-override["nodejs"]["npm"]["version"] = "1.3.7"
+override["nodejs"]["npm"]["version"] = node["mconf-lb"]["node"]["npm"]["version"]
 
 # Cache the full application path depending on whether capistrano is being used
 if node['mconf-lb']['deploy_with_cap']

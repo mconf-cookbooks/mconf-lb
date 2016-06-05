@@ -15,6 +15,10 @@ default['mconf-lb']['domain']    = '192.168.0.100'
 default['mconf-lb']['deploy_to'] = '/var/www/mconf-lb'
 default['mconf-lb']['deploy_with_cap'] = true
 
+# Node.js options
+default['mconf-lb']['node']['version']  = '0.8.25'
+default['mconf-lb']['node']['npm']['version'] = '1.4.28'
+
 # SSL
 default['mconf-lb']['ssl']['enable'] = false
 default['mconf-lb']['ssl']['certificates']['certificate_file'] = ''
