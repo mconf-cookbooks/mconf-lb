@@ -71,7 +71,7 @@ service "nginx"
 
 # Certificates for nginx
 if node['mconf-lb']['ssl']['enable']
-  directory "/etc/nginx/ssl" do
+  directory node['mconf-lb']['ssl']['certificates']['path'] do
     owner 'root'
     group node['mconf-lb']['app-group']
     mode 00640
@@ -86,7 +86,7 @@ if node['mconf-lb']['ssl']['enable']
   certs.each do |cert_name, value|
     file = node['mconf-lb']['ssl']['certificates'][cert_name]
     if file && file.strip != ''
-      path = "/etc/nginx/ssl/#{file}"
+      path = "#{node['mconf-lb']['ssl']['certificates']['path']}/#{file}"
       cookbook_file path do
         source file
         owner 'root'
@@ -94,6 +94,7 @@ if node['mconf-lb']['ssl']['enable']
         mode 00640
         action :create
         notifies :restart, "service[nginx]", :delayed
+        only_if { node['mconf-lb']['ssl']['copy_certificates'] }
       end
     end
     certs[cert_name] = path
