@@ -10,7 +10,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
 
-execute "apt-get update"
+include_recipe "apt"
 
 include_recipe "build-essential"
 
@@ -31,20 +31,6 @@ end
 # Node.js
 include_recipe "nodejs"
 include_recipe "nodejs::npm"
-
-# change the default npm directory so we're sure it is used only for npm
-# the default is ~/npm, but that might be too generic
-execute "npm config set tmp /home/#{node["mconf-lb"]["user"]}/npmtmp"
-
-# Npm is installed as root and ~/.npm ends up being owned by root, but it shouldn't.
-# Newer versions of node/npm might not need this anymore.
-# See: https://github.com/npm/npm/issues/3350
-execute "sudo rm -R /home/#{node["mconf-lb"]["user"]}/.npm" do
-  not_if { !::File.exists?("/home/#{node["mconf-lb"]["user"]}/.npm") }
-end
-execute "sudo rm -R /home/#{node["mconf-lb"]["user"]}/npmtmp" do
-  not_if { !::File.exists?("/home/#{node["mconf-lb"]["user"]}/npmtmp") }
-end
 
 # disable the site in nginx temporarily so it doesn't break the
 # rest of the installation if it's incorrect

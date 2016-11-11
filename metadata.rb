@@ -17,15 +17,17 @@ version          '0.1.0'
 supports 'ubuntu', '>= 14.04'
 
 suggests 'mconf-db'
-depends  'mysql2_chef_gem', '~> 1.0'
 depends  'mysql', '~> 6.0'
 depends  'database', '~> 4.0'
-depends  'nodejs', '2.4.2'
+depends  'nodejs', '~> 3.0'
 depends  'ohai', '2.0.1'
-depends  'nginx', '~> 2.7'
 depends  'build-essential', '>= 2.0'
 depends  'heartbeat', '~> 1.0'
 depends  'monit-ng', '~> 2.1.0'
 depends  'logrotate', '~> 1.9'
+depends  'apt', '>= 2.9'
+
+# TODO: update to 3.0 when done, 2.x is old
+depends  'nginx', '~> 2.7'
 
 recipe 'mconf-lb::default', 'Sets up an instance of Mconf LB'
