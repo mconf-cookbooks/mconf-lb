@@ -10,6 +10,8 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
 
+::Chef::Recipe.send(:include, MconfLB::Helper)
+
 include_recipe "apt"
 
 include_recipe "build-essential"
@@ -150,12 +152,23 @@ logrotate_app 'nginx' do
 end
 
 
-# Upstart
-template "/etc/init/mconf-lb.conf" do
-  source "upstart-script.conf.erb"
-  mode 00644
-  owner "root"
-  group "root"
+# Service
+# Note: we don't use a "service mconf-lb" here because the application is started
+# and stopped by monit and by capistrano with restart.txt
+if use_systemd?
+  template "/etc/systemd/system/mconf-lb.service" do
+    source "systemd-mconf-lb.service.erb"
+    mode 00644
+    owner "root"
+    group "root"
+  end
+else
+  template "/etc/init/mconf-lb.conf" do
+    source "upstart-script.conf.erb"
+    mode 00644
+    owner "root"
+    group "root"
+  end
 end
 
 
