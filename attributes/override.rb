@@ -15,9 +15,6 @@ override["nodejs"]["version"] = node["mconf-lb"]["node"]["version"]
 override['nodejs']['binary']['url'] = "https://nodejs.org/download/release/v0.8.25/node-v0.8.25-linux-x64.tar.gz"
 override['nodejs']['binary']['checksum'] = "7eedbece123b5acacfa5ca9d1e7a1ab6bd9b32bed5b3c92f6853cca57be82d07"
 
-#override["nodejs"]["prefix_url"]["node"] = "https://nodejs.org/download/release/"
-
-
 override["nodejs"]["npm"]["install_method"] = "source"
 override["nodejs"]["npm"]["version"] = node["mconf-lb"]["node"]["npm"]["version"]
 
@@ -97,3 +94,6 @@ if node['mconf-lb']['monit']['enable_alerts']
   end
   override["monit"]["config"]["alert"] = alerts
 end
+
+# systemd on Ubuntu >= 16.04
+override['mconf-lb']['use_systemd'] = node['platform'] == 'ubuntu' && Gem::Version.new(node['platform_version']) >= Gem::Version.new('16.04')

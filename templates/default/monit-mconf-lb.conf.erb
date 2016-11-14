@@ -5,8 +5,13 @@ check process mconf-lb with pidfile "/var/run/mconf-lb.pid"
 <% if @cycle_multiplier > 1 %>
     every <%= @cycle_multiplier %> cycles
 <% end %>
+<% if @use_systemd %>
+    start program = "/bin/systemctl start mconf-lb"
+    stop program = "/bin/systemctl stop mconf-lb"
+<% else %>
     start program = "/sbin/start mconf-lb"
     stop program = "/sbin/stop mconf-lb"
+<% end %>
 
     if failed port 3000 protocol HTTP
         request /ping

@@ -10,8 +10,6 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
 
-::Chef::Recipe.send(:include, MconfLB::Helper)
-
 include_recipe "apt"
 
 include_recipe "build-essential"
@@ -155,12 +153,15 @@ end
 # Service
 # Note: we don't use a "service mconf-lb" here because the application is started
 # and stopped by monit and by capistrano with restart.txt
-if use_systemd?
+if node['mconf-lb']['use_systemd']
   template "/etc/systemd/system/mconf-lb.service" do
     source "systemd-mconf-lb.service.erb"
     mode 00644
     owner "root"
     group "root"
+  end
+  service "mconf-lb" do
+    action :enable
   end
 else
   template "/etc/init/mconf-lb.conf" do
@@ -175,18 +176,15 @@ end
 # Monit
 include_recipe "monit-ng"
 
-# remove the old file first to prevent conflicts
-file "#{node["monit"]["conf_dir"]}/mconf-lb" do
-  action :delete
-end
 template "#{node["monit"]["conf_dir"]}/mconf-lb.conf" do
-  source "mconf-lb.monitrc.erb"
+  source "monit-mconf-lb.conf.erb"
   mode 00644
   owner "root"
   group "root"
   variables(
     cycle_multiplier: node['mconf-lb']['heartbeat']['enable'] ? 60 : 1,
-    abort_on_restarts: node['mconf-lb']['monit']['abort_on_restarts']
+    abort_on_restarts: node['mconf-lb']['monit']['abort_on_restarts'],
+    use_systemd: node['mconf-lb']['use_systemd']
   )
   notifies :restart, "service[monit]", :delayed
 end
@@ -233,18 +231,24 @@ if node['mconf-lb']['heartbeat']['enable']
 
   # Monit configs for heartbeat
   template "#{node["monit"]["conf_dir"]}/mconf-lb-pid.conf" do
-    source "mconf-lb-pid.monitrc.erb"
+    source "monit-mconf-lb-pid.conf.erb"
     mode 00644
     owner 'root'
     group 'root'
+    variables(
+      use_systemd: node['mconf-lb']['use_systemd']
+    )
     notifies :restart, "service[monit]", :delayed
   end
 
   template "#{node["monit"]["conf_dir"]}/mconf-lb-heartbeat.conf" do
-    source "mconf-lb-heartbeat.monitrc.erb"
+    source "monit-mconf-lb-heartbeat.conf.erb"
     mode 00644
     owner 'root'
     group 'root'
+    variables(
+      use_systemd: node['mconf-lb']['use_systemd']
+    )
     notifies :restart, "service[monit]", :delayed
   end
 end

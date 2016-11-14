@@ -22,7 +22,7 @@ depends  'nodejs', '~> 3.0'
 depends  'ohai', '2.0.1'
 depends  'build-essential', '>= 2.0'
 depends  'heartbeat', '~> 1.0'
-depends  'monit-ng', '~> 2.1.0'
+depends  'monit-ng', '~> 2.3'
 depends  'logrotate', '~> 1.9'
 depends  'apt', '>= 2.9'
 
