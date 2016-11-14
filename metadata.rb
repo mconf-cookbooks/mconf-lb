@@ -17,8 +17,7 @@ version          '0.1.0'
 supports 'ubuntu', '>= 14.04'
 
 suggests 'mconf-db'
-depends  'mysql', '~> 6.0'
-depends  'database', '~> 4.0'
+
 depends  'nodejs', '~> 3.0'
 depends  'ohai', '2.0.1'
 depends  'build-essential', '>= 2.0'
