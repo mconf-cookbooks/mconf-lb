@@ -2,19 +2,20 @@
 Description=Runs Mconf-LB
 
 [Service]
-Type=simple
+Type=forking
 SyslogIdentifier=mconf-lb
-WorkingDirectory=<%= node['mconf-lb']['deploy_to'] %>/current
-ExecStart=/bin/sh -c '/usr/local/bin/node app.js -l 2 -p 3000 >> <%= node['mconf-lb']['deploy_to'] %>/current/log/production.log 2>&1'
+WorkingDirectory=<%= node['mconf-lb']['deploy_to'] %>
+# ExecStart=/bin/sh -c '/usr/local/bin/node app.js -l 2 -p 3000 >> <%= node['mconf-lb']['deploy_to'] %>/log/production.log 2>&1'
+ExecStart=/bin/sh -c '<%= node['mconf-lb']['deploy_to'] %>/systemd-start.sh <%= node['mconf-lb']['logfile'] %> -l 2 -p 3000 > <%= node['mconf-lb']['pidfile'] %>'
+PIDFile=<%= node['mconf-lb']['pidfile'] %>
 StandardOutput=syslog
 StandardError=syslog
 User=<%= node['mconf-lb']['user'] %>
 Environment=NODE_ENV=production
-ExecStartPre=/bin/sh -ec "echo \"[`date -u +%Y-%m-%dT%T.%3NZ`] (sys) Starting\" >> <%= node['mconf-lb']['deploy_to'] %>/current/log/production.log"
-ExecStopPost=/bin/sh -ec "echo \"[`date -u +%Y-%m-%dT%T.%3NZ`] (sys) Stopping\" >> <%= node['mconf-lb']['deploy_to'] %>/current/log/production.log"
+ExecStartPre=/bin/sh -ec "echo \"[`date -u +%Y-%m-%dT%T.%3NZ`] (sys) Starting\" >> <%= node['mconf-lb']['deploy_to'] %>/log/production.log"
+ExecStopPost=/bin/sh -ec "echo \"[`date -u +%Y-%m-%dT%T.%3NZ`] (sys) Stopping\" >> <%= node['mconf-lb']['deploy_to'] %>/log/production.log"
 # Group=srv-node-sample
 # Restart=always
-# PIDFile=/var/run/mconf-lb.pid
 
 [Install]
 WantedBy=multi-user.target

@@ -4,6 +4,11 @@
 # Will check the pid file every interval
 # Expects the cycle interval to be set to 1 second.
 
-check process mconf-lb-pid with pidfile "/var/run/mconf-lb.pid"
+check process mconf-lb-pid with pidfile "<%= node['mconf-lb']['pidfile'] %>"
+<% if node['mconf-lb']['use_systemd'] %>
+    start program = "/bin/systemctl start mconf-lb"
+    stop program = "/bin/systemctl stop mconf-lb"
+<% else %>
     start program = "/sbin/start mconf-lb"
     stop program = "/sbin/stop mconf-lb"
+<% end %>

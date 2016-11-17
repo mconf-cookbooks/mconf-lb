@@ -11,9 +11,11 @@ default['mconf-lb']['user']      = node['mconf']['user'] || 'mconf'
 default['mconf-lb']['app_group'] = node['mconf']['app_group'] || 'mconf'
 
 # LB general configurations
-default['mconf-lb']['domain']    = '192.168.0.100'
-default['mconf-lb']['deploy_to'] = '/var/www/mconf-lb'
-default['mconf-lb']['deploy_with_cap'] = true
+default['mconf-lb']['domain']         = '192.168.0.100'
+default['mconf-lb']['deploy_base']    = '/var/www/mconf-lb'
+default['mconf-lb']['deploy_to']      = '/var/www/mconf-lb/current'
+default['mconf-lb']['pidfile']        = '/var/www/mconf-lb/shared/mconf-lb.pid'
+default['mconf-lb']['logfile']        = '/var/www/mconf-lb/current/log/production.log'
 
 # Node.js options
 default['mconf-lb']['node']['version']  = '0.8.25'

@@ -20,7 +20,7 @@ end
 
 # Create the app directory
 # (Just the directory, capistrano does the rest)
-directory node['mconf-lb']['deploy_to'] do
+directory node['mconf-lb']['deploy_base'] do
   owner node['mconf-lb']['user']
   group node['mconf-lb']['app_group']
   mode '0755'
@@ -159,6 +159,9 @@ if node['mconf-lb']['use_systemd']
     mode 00644
     owner "root"
     group "root"
+    variables(
+      pidfile: node['mconf-lb']['pidfile']
+    )
   end
   service "mconf-lb" do
     action :enable
@@ -183,8 +186,7 @@ template "#{node["monit"]["conf_dir"]}/mconf-lb.conf" do
   group "root"
   variables(
     cycle_multiplier: node['mconf-lb']['heartbeat']['enable'] ? 60 : 1,
-    abort_on_restarts: node['mconf-lb']['monit']['abort_on_restarts'],
-    use_systemd: node['mconf-lb']['use_systemd']
+    abort_on_restarts: node['mconf-lb']['monit']['abort_on_restarts']
   )
   notifies :restart, "service[monit]", :delayed
 end
@@ -192,7 +194,7 @@ end
 # logrotate
 logrotate_app 'mconf-lb' do
   cookbook 'logrotate'
-  path ["#{node['mconf-lb']['deploy_to_full']}/log/*.log"]
+  path ["#{node['mconf-lb']['deploy_to']}/log/*.log"]
   options ['missingok', 'compress', 'copytruncate', 'notifempty', 'dateext']
   frequency node['mconf-lb']['logrotate']['frequency']
   rotate node['mconf-lb']['logrotate']['rotate']
@@ -235,9 +237,6 @@ if node['mconf-lb']['heartbeat']['enable']
     mode 00644
     owner 'root'
     group 'root'
-    variables(
-      use_systemd: node['mconf-lb']['use_systemd']
-    )
     notifies :restart, "service[monit]", :delayed
   end
 
@@ -246,9 +245,6 @@ if node['mconf-lb']['heartbeat']['enable']
     mode 00644
     owner 'root'
     group 'root'
-    variables(
-      use_systemd: node['mconf-lb']['use_systemd']
-    )
     notifies :restart, "service[monit]", :delayed
   end
 end

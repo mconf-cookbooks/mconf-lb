@@ -18,13 +18,6 @@ override['nodejs']['binary']['checksum'] = "7eedbece123b5acacfa5ca9d1e7a1ab6bd9b
 override["nodejs"]["npm"]["install_method"] = "source"
 override["nodejs"]["npm"]["version"] = node["mconf-lb"]["node"]["npm"]["version"]
 
-# Cache the full application path depending on whether capistrano is being used
-if node['mconf-lb']['deploy_with_cap']
-  override['mconf-lb']['deploy_to_full'] = "#{node['mconf-lb']['deploy_to']}/current"
-else
-  override['mconf-lb']['deploy_to_full'] = node['mconf-lb']['deploy_to']
-end
-
 # Install from source because we need a newer version
 nginx_version = "1.6.0"
 override["nginx"]["version"] = nginx_version
