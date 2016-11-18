@@ -129,6 +129,8 @@ template "/etc/nginx/sites-available/mconf-lb" do
     domain: node["mconf-lb"]["domain"],
     deploy_to: node["mconf-lb"]["deploy_to"],
     ssl: node["mconf-lb"]["ssl"]["enable"],
+    ssl_http_api: node["mconf-lb"]["ssl"]["http_api"],
+    use_custom_log: node["mconf-lb"]["nginx"]["custom_log_format"] != nil,
     certificates: node.run_state["mconf-lb-certs"]
   })
   notifies :restart, "service[nginx]", :delayed

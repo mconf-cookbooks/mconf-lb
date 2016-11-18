@@ -27,6 +27,8 @@ default['mconf-lb']['ssl']['certificates']['certificate_key_file'] = ''
 # whether certificates will be copied from the cookbook or not (if not,
 # someone else has to put the certificates where nginx expects them to be)
 default['mconf-lb']['ssl']['copy_certificates'] = true
+# if true, the API is served both as HTTP and HTTPS, all the rest is redirected to HTTPS
+default['mconf-lb']['ssl']['http_api'] = true
 
 # Monit
 default['mconf-lb']['monit']['interval']          = 30 # interval between checks, in seconds
@@ -76,6 +78,8 @@ default['mconf-lb']['logrotate']['size']      = nil
 default['mconf-lb']['nginx']['logrotate']['frequency'] = 'daily'
 default['mconf-lb']['nginx']['logrotate']['rotate']    = 90
 default['mconf-lb']['nginx']['logrotate']['size']      = nil
+# add a custom log to log to nginx
+default['mconf-lb']['nginx']['custom_log_format']      = nil
 
 # Heartbeat
 default['mconf-lb']['heartbeat']['enable'] = false
