@@ -37,6 +37,12 @@ override['nginx']['source']['default_configure_flags'] = %W(
   --sbin-path=#{node['nginx']['source']['sbin_path']}
 )
 
+# this is the default plus the scheme used (http/https)
+unless node['mconf-lb']['nginx']['custom_log_format'].nil?
+  override["nginx"]["log_formats"] = {
+    "custom" => node['mconf-lb']['nginx']['custom_log_format']
+  }
+end
 
 # Default options for monit.
 # Most of the paths and options here are copied from the defaults in the Ubuntu packages.
