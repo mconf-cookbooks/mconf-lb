@@ -139,7 +139,7 @@ logrotate_app 'nginx' do
   frequency node['mconf-lb']['nginx']['logrotate']['frequency']
   rotate node['mconf-lb']['nginx']['logrotate']['rotate']
   size node['mconf-lb']['nginx']['logrotate']['size']
-  create "640 root root"
+  create "0600 root root"
   sharedscripts
   prerotate <<-EOF
     if [ -d /etc/logrotate.d/httpd-prerotate ]; then \\
@@ -201,7 +201,7 @@ logrotate_app 'mconf-lb' do
   frequency node['mconf-lb']['logrotate']['frequency']
   rotate node['mconf-lb']['logrotate']['rotate']
   size node['mconf-lb']['logrotate']['size']
-  create "644 #{node['mconf-lb']['user']} #{node['mconf-lb']['app_group']}"
+  create "0600 #{node['mconf-lb']['user']} #{node['mconf-lb']['app_group']}"
 end
 
 # Heartbeat
