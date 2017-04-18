@@ -80,7 +80,7 @@ if node['mconf-lb']['ssl']['enable']
         mode 00640
         action :create
         notifies :restart, "service[nginx]", :delayed
-        only_if { node['mconf-lb']['ssl']['copy_certificates'] }
+        only_if { run_context.has_cookbook_file_in_cookbook?('mconf-lb', file) }
       end
     end
     certs[cert_name] = path

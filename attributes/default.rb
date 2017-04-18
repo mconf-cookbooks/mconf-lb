@@ -26,9 +26,6 @@ default['mconf-lb']['ssl']['enable'] = false
 default['mconf-lb']['ssl']['certificates']['path'] = '/etc/nginx/ssl'
 default['mconf-lb']['ssl']['certificates']['certificate_file'] = ''
 default['mconf-lb']['ssl']['certificates']['certificate_key_file'] = ''
-# whether certificates will be copied from the cookbook or not (if not,
-# someone else has to put the certificates where nginx expects them to be)
-default['mconf-lb']['ssl']['copy_certificates'] = true
 # if true, the API is served both as HTTP and HTTPS, all the rest is redirected to HTTPS
 default['mconf-lb']['ssl']['http_api'] = true
 
