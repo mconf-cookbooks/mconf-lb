@@ -117,7 +117,8 @@ template "/etc/nginx/sites-available/mconf-lb" do
     ssl: node["mconf-lb"]["ssl"]["enable"],
     ssl_http_api: node["mconf-lb"]["ssl"]["http_api"],
     use_custom_log: node["mconf-lb"]["nginx"]["custom_log_format"] != nil,
-    certificates: node.run_state["mconf-lb-certs"]
+    certificates: node.run_state["mconf-lb-certs"],
+    tmp_redirect_api: node["mconf-lb"]["tmp-redirect-api"]
   })
   notifies :restart, "service[nginx]", :delayed
 end

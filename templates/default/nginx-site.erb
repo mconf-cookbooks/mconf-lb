@@ -31,6 +31,17 @@ server {
 
 <% if @ssl %>
 
+  <% if @tmp_redirect_api %>
+    <% ['/bigbluebutton/api/getRecordings', '/bigbluebutton/api/getMeetingInfo', '/bigbluebutton/api/isMeetingRunning'].each do |route| %>
+  location <%= route %> {
+    proxy_pass <%= @tmp_redirect_api %>$request_uri;
+  }
+    <% end %>
+  location = /bigbluebutton/api {
+    proxy_pass <%= @tmp_redirect_api %>$request_uri;
+  }
+  <% end %>
+
   <% if @ssl_http_api %>
   # respond only to the API in HTTP
   location /bigbluebutton/api {
@@ -77,7 +88,7 @@ server {
 }
 
 <% if @ssl %>
-server {
+  server {
   listen 443 ssl;
   ssl_certificate <%= @certificates[:certificate_file] %>;
   ssl_certificate_key <%= @certificates[:certificate_key_file] %>;
@@ -107,6 +118,17 @@ server {
   gzip_types text/plain text/css application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript;
 
   try_files $uri @node;
+
+  <% if @tmp_redirect_api %>
+    <% ['/bigbluebutton/api/getRecordings', '/bigbluebutton/api/getMeetingInfo', '/bigbluebutton/api/isMeetingRunning'].each do |route| %>
+  location <%= route %> {
+    proxy_pass <%= @tmp_redirect_api %>$request_uri;
+  }
+    <% end %>
+  location = /bigbluebutton/api {
+    proxy_pass <%= @tmp_redirect_api %>$request_uri;
+  }
+  <% end %>
 
   location @node {
     proxy_set_header Upgrade $http_upgrade;
