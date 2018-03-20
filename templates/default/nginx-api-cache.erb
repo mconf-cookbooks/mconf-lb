@@ -1,0 +1,30 @@
+location = /bigbluebutton/api {
+  proxy_cache api;
+  proxy_cache_valid 200 60m;
+  include "/etc/nginx/includes/mconf-lb-node.conf";
+}
+location /bigbluebutton/api/isMeetingRunning {
+  proxy_cache api;
+  proxy_cache_valid 200 5s;
+  include "/etc/nginx/includes/mconf-lb-node.conf";
+}
+location /bigbluebutton/api/getMeetingInfo {
+  proxy_cache api;
+  proxy_cache_valid 200 5s;
+  include "/etc/nginx/includes/mconf-lb-node.conf";
+}
+location /bigbluebutton/api/getDefaultConfigXML {
+  proxy_cache api;
+  proxy_cache_valid 200 60m;
+  include "/etc/nginx/includes/mconf-lb-node.conf";
+}
+location /bigbluebutton/api/getMeetings {
+  proxy_cache api;
+  proxy_cache_valid 200 5s;
+  include "/etc/nginx/includes/mconf-lb-node.conf";
+}
+location /bigbluebutton/api/getRecordings {
+  proxy_cache api;
+  proxy_cache_valid 200 2m;
+  include "/etc/nginx/includes/mconf-lb-node.conf";
+}

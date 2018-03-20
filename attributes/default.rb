@@ -17,10 +17,6 @@ default['mconf-lb']['deploy_to']      = '/var/www/mconf-lb/current'
 default['mconf-lb']['pidfile']        = '/var/www/mconf-lb/shared/mconf-lb.pid'
 default['mconf-lb']['logfile']        = '/var/www/mconf-lb/current/log/production.log'
 
-# TEMPORARY
-# Redirects some API routes to another server
-default["mconf-lb"]["tmp-redirect-api"] = false
-
 # Node.js options
 default['mconf-lb']['node']['version']  = '0.8.25'
 default['mconf-lb']['node']['npm']['version'] = '1.4.28'
@@ -83,6 +79,8 @@ default['mconf-lb']['nginx']['logrotate']['rotate']    = 90
 default['mconf-lb']['nginx']['logrotate']['size']      = nil
 # add a custom log to log to nginx
 default['mconf-lb']['nginx']['custom_log_format']      = nil
+# cache api calls?
+default['mconf-lb']['nginx']['cache_api']              = true
 
 # Heartbeat
 default['mconf-lb']['heartbeat']['enable'] = false

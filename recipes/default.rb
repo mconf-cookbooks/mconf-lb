@@ -106,6 +106,22 @@ file "/etc/nginx/includes/mconf-lb-proxy.conf" do
   action :delete
 end
 
+template "/etc/nginx/includes/mconf-lb-node.conf" do
+  source "nginx-node.erb"
+  mode 00644
+  owner "root"
+  group "root"
+  notifies :restart, "service[nginx]", :delayed
+end
+
+template "/etc/nginx/includes/mconf-lb-api-cache.conf" do
+  source "nginx-api-cache.erb"
+  mode 00644
+  owner "root"
+  group "root"
+  notifies :restart, "service[nginx]", :delayed
+end
+
 template "/etc/nginx/sites-available/mconf-lb" do
   source "nginx-site.erb"
   mode 00644
@@ -118,7 +134,7 @@ template "/etc/nginx/sites-available/mconf-lb" do
     ssl_http_api: node["mconf-lb"]["ssl"]["http_api"],
     use_custom_log: node["mconf-lb"]["nginx"]["custom_log_format"] != nil,
     certificates: node.run_state["mconf-lb-certs"],
-    tmp_redirect_api: node["mconf-lb"]["tmp-redirect-api"]
+    cache_api: node["mconf-lb"]["nginx"]["cache_api"]
   })
   notifies :restart, "service[nginx]", :delayed
 end
