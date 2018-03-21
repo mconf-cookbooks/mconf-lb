@@ -23,9 +23,6 @@ add_header X-XSS-Protection "1; mode=block";
 
 proxy_cache_path /tmp/nginx_cache keys_zone=api:10m;
 proxy_cache_key $host$request_uri;
-#proxy_cache_valid 200 10s;
-proxy_ignore_headers "Set-Cookie";
-proxy_hide_header "Set-Cookie";
 proxy_cache_lock on;
 # proxy_buffer_size 8k;
 
@@ -40,7 +37,6 @@ server {
   server_name <%= @domain %>;
 
 <% if @ssl %>
-
   <% if @ssl_http_api %>
     <% if @cache_api %>
   include "/etc/nginx/includes/mconf-lb-api-cache.conf";
