@@ -95,87 +95,88 @@ if node['mconf-lb']['ssl']['enable'] && node['mconf-lb']['nginx']['enabled']
   execute "openssl dhparam -out #{dhp_2048_file} 2048" do
     not_if { ::File.exists?(dhp_2048_file) }
   end
-end
 
-directory "/etc/nginx/includes" do
-  owner "root"
-  group "root"
-  mode 00755
-  action :create
-  only_if { node['mconf-lb']['nginx']['enabled'] }
-end
+  directory "/etc/nginx/includes" do
+    owner "root"
+    group "root"
+    mode 00755
+    action :create
+    only_if { node['mconf-lb']['nginx']['enabled'] }
+  end
 
-# remove the old include file, if it exists
-file "/etc/nginx/includes/mconf-lb-proxy.conf" do
-  action :delete
-  # only_if { node['mconf-lb']['nginx']['enabled'] }
-end
+  # remove the old include file, if it exists
+  file "/etc/nginx/includes/mconf-lb-proxy.conf" do
+    action :delete
+    # only_if { node['mconf-lb']['nginx']['enabled'] }
+  end
 
-template "/etc/nginx/includes/mconf-lb-node.conf" do
-  source "nginx-node.erb"
-  mode 00644
-  owner "root"
-  group "root"
-  notifies :restart, "service[nginx]", :delayed
-  only_if { node['mconf-lb']['nginx']['enabled'] }
-end
+  template "/etc/nginx/includes/mconf-lb-node.conf" do
+    source "nginx-node.erb"
+    mode 00644
+    owner "root"
+    group "root"
+    notifies :restart, "service[nginx]", :delayed
+    only_if { node['mconf-lb']['nginx']['enabled'] }
+  end
 
-template "/etc/nginx/includes/mconf-lb-api-cache.conf" do
-  source "nginx-api-cache.erb"
-  mode 00644
-  owner "root"
-  group "root"
-  notifies :restart, "service[nginx]", :delayed
-  only_if { node['mconf-lb']['nginx']['enabled'] }
-end
+  template "/etc/nginx/includes/mconf-lb-api-cache.conf" do
+    source "nginx-api-cache.erb"
+    mode 00644
+    owner "root"
+    group "root"
+    notifies :restart, "service[nginx]", :delayed
+    only_if { node['mconf-lb']['nginx']['enabled'] }
+  end
 
-template "/etc/nginx/sites-available/#{node['mconf-lb']['app_name']}" do
-  source "nginx-site.erb"
-  mode 00644
-  owner "root"
-  group "root"
-  variables({
-    domain: node["mconf-lb"]["domain"],
-    deploy_to: node["mconf-lb"]["deploy_to"],
-    ssl: node["mconf-lb"]["ssl"]["enable"],
-    ssl_http_api: node["mconf-lb"]["ssl"]["http_api"],
-    use_custom_log: node["mconf-lb"]["nginx"]["custom_log_format"] != nil,
-    certificates: node.run_state["mconf-lb-certs"],
-    cache_api: node["mconf-lb"]["nginx"]["cache_api"]
-  })
-  notifies :restart, "service[nginx]", :delayed
-  only_if { node['mconf-lb']['nginx']['enabled'] }
-end
+  template "/etc/nginx/sites-available/#{node['mconf-lb']['app_name']}" do
+    source "nginx-site.erb"
+    mode 00644
+    owner "root"
+    group "root"
+    variables({
+      domain: node["mconf-lb"]["domain"],
+      deploy_to: node["mconf-lb"]["deploy_to"],
+      ssl: node["mconf-lb"]["ssl"]["enable"],
+      ssl_http_api: node["mconf-lb"]["ssl"]["http_api"],
+      use_custom_log: node["mconf-lb"]["nginx"]["custom_log_format"] != nil,
+      certificates: node.run_state["mconf-lb-certs"],
+      cache_api: node["mconf-lb"]["nginx"]["cache_api"]
+    })
+    notifies :restart, "service[nginx]", :delayed
+    only_if { node['mconf-lb']['nginx']['enabled'] }
+  end
 
-execute "nxensite #{node['mconf-lb']['app_name']}" do
-  creates "/etc/nginx/sites-enabled/#{node['mconf-lb']['app_name']}"
-  notifies :restart, "service[nginx]", :delayed
-  only_if { node['mconf-lb']['nginx']['enabled'] }
-end
+  execute "nxensite #{node['mconf-lb']['app_name']}" do
+    creates "/etc/nginx/sites-enabled/#{node['mconf-lb']['app_name']}"
+    notifies :restart, "service[nginx]", :delayed
+    only_if { node['mconf-lb']['nginx']['enabled'] }
+  end
 
-# logrotate for nginx (the cookbook doesn't configure it, we're not
-# overriding it)
-# this is mostly based on the config used by a newer version of the
-# cookbook nginx, see:
-# https://github.com/miketheman/nginx/blob/cdc31cd03606c5ae1914c7fbc93b2a7635647cd2/templates/default/nginx.logrotate.erb
-logrotate_app 'nginx' do
-  cookbook 'logrotate'
-  path ["#{node['nginx']['log_dir']}/*.log"]
-  options ['missingok', 'compress', 'copytruncate', 'notifempty', 'dateext']
-  frequency node['mconf-lb']['nginx']['logrotate']['frequency']
-  rotate node['mconf-lb']['nginx']['logrotate']['rotate']
-  size node['mconf-lb']['nginx']['logrotate']['size']
-  create "0600 root root"
-  sharedscripts
-  prerotate <<-EOF
-    if [ -d /etc/logrotate.d/httpd-prerotate ]; then \\
-      run-parts /etc/logrotate.d/httpd-prerotate; \\
-    fi;
-  EOF
-  postrotate <<-EOF
-    [ ! -f #{node['nginx']['pid']} ] || kill -USR1 `cat #{node['nginx']['pid']}`
-  EOF
-  only_if { node['mconf-lb']['nginx']['enabled'] }
+  # logrotate for nginx (the cookbook doesn't configure it, we're not
+  # overriding it)
+  # this is mostly based on the config used by a newer version of the
+  # cookbook nginx, see:
+  # https://github.com/miketheman/nginx/blob/cdc31cd03606c5ae1914c7fbc93b2a7635647cd2/templates/default/nginx.logrotate.erb
+  logrotate_app 'nginx' do
+    cookbook 'logrotate'
+    path ["#{node['nginx']['log_dir']}/*.log"]
+    options ['missingok', 'compress', 'copytruncate', 'notifempty', 'dateext']
+    frequency node['mconf-lb']['nginx']['logrotate']['frequency']
+    rotate node['mconf-lb']['nginx']['logrotate']['rotate']
+    size node['mconf-lb']['nginx']['logrotate']['size']
+    create "0600 root root"
+    sharedscripts
+    prerotate <<-EOF
+      if [ -d /etc/logrotate.d/httpd-prerotate ]; then \\
+        run-parts /etc/logrotate.d/httpd-prerotate; \\
+      fi;
+    EOF
+    postrotate <<-EOF
+      [ ! -f #{node['nginx']['pid']} ] || kill -USR1 `cat #{node['nginx']['pid']}`
+    EOF
+    only_if { node['mconf-lb']['nginx']['enabled'] }
+  end
+
 end
 
 
