@@ -36,27 +36,30 @@ include_recipe "nodejs::npm"
 # rest of the installation if it's incorrect
 execute "nxdissite mconf-lb" do
   ignore_failure true
+  only_if { node['mconf-lb']['nginx']['enabled'] }
 end
 
 # TODO: it is apparently always compiling and restarting nginx, shouldn't do it
 # all the time
-include_recipe "nginx"
-service "nginx"
+if node['mconf-lb']['nginx']['enabled']
+  include_recipe "nginx"
+  service "nginx"
 
-## alternative: install from a PPA
-# node.set["nginx"]["version"] = "1.6.0"
-# node.set["nginx"]["install_method"] = "package"
-# apt_repository "nginx" do
-#   uri "http://ppa.launchpad.net/nginx/stable/ubuntu"
-#   components ["precise", "main"]
-#   keyserver "keyserver.ubuntu.com"
-#   key "C300EE8C"
-# end
-# execute "apt-get update"
-# include_recipe "nginx"
+  ## alternative: install from a PPA
+  # node.set["nginx"]["version"] = "1.6.0"
+  # node.set["nginx"]["install_method"] = "package"
+  # apt_repository "nginx" do
+  #   uri "http://ppa.launchpad.net/nginx/stable/ubuntu"
+  #   components ["precise", "main"]
+  #   keyserver "keyserver.ubuntu.com"
+  #   key "C300EE8C"
+  # end
+  # execute "apt-get update"
+  # include_recipe "nginx"
+end
 
 # Certificates for nginx
-if node['mconf-lb']['ssl']['enable']
+if node['mconf-lb']['ssl']['enable'] && node['mconf-lb']['nginx']['enabled']
   directory node['mconf-lb']['ssl']['certificates']['path'] do
     owner 'root'
     group node['mconf-lb']['app-group']
@@ -99,11 +102,13 @@ directory "/etc/nginx/includes" do
   group "root"
   mode 00755
   action :create
+  only_if { node['mconf-lb']['nginx']['enabled'] }
 end
 
 # remove the old include file, if it exists
 file "/etc/nginx/includes/mconf-lb-proxy.conf" do
   action :delete
+  # only_if { node['mconf-lb']['nginx']['enabled'] }
 end
 
 template "/etc/nginx/includes/mconf-lb-node.conf" do
@@ -112,6 +117,7 @@ template "/etc/nginx/includes/mconf-lb-node.conf" do
   owner "root"
   group "root"
   notifies :restart, "service[nginx]", :delayed
+  only_if { node['mconf-lb']['nginx']['enabled'] }
 end
 
 template "/etc/nginx/includes/mconf-lb-api-cache.conf" do
@@ -120,9 +126,10 @@ template "/etc/nginx/includes/mconf-lb-api-cache.conf" do
   owner "root"
   group "root"
   notifies :restart, "service[nginx]", :delayed
+  only_if { node['mconf-lb']['nginx']['enabled'] }
 end
 
-template "/etc/nginx/sites-available/mconf-lb" do
+template "/etc/nginx/sites-available/#{node['mconf-lb']['app_name']}" do
   source "nginx-site.erb"
   mode 00644
   owner "root"
@@ -137,11 +144,13 @@ template "/etc/nginx/sites-available/mconf-lb" do
     cache_api: node["mconf-lb"]["nginx"]["cache_api"]
   })
   notifies :restart, "service[nginx]", :delayed
+  only_if { node['mconf-lb']['nginx']['enabled'] }
 end
 
-execute "nxensite mconf-lb" do
-  creates "/etc/nginx/sites-enabled/mconf-lb"
+execute "nxensite #{node['mconf-lb']['app_name']}" do
+  creates "/etc/nginx/sites-enabled/#{node['mconf-lb']['app_name']}"
   notifies :restart, "service[nginx]", :delayed
+  only_if { node['mconf-lb']['nginx']['enabled'] }
 end
 
 # logrotate for nginx (the cookbook doesn't configure it, we're not
@@ -166,6 +175,7 @@ logrotate_app 'nginx' do
   postrotate <<-EOF
     [ ! -f #{node['nginx']['pid']} ] || kill -USR1 `cat #{node['nginx']['pid']}`
   EOF
+  only_if { node['mconf-lb']['nginx']['enabled'] }
 end
 
 
@@ -173,7 +183,7 @@ end
 # Note: we don't use a "service mconf-lb" here because the application is started
 # and stopped by monit and by capistrano with restart.txt
 if node['mconf-lb']['use_systemd']
-  template "/etc/systemd/system/mconf-lb.service" do
+  template "/etc/systemd/system/#{node['mconf-lb']['app_name']}.service" do
     source "systemd-mconf-lb.service.erb"
     mode 00644
     owner "root"
@@ -182,11 +192,11 @@ if node['mconf-lb']['use_systemd']
       pidfile: node['mconf-lb']['pidfile']
     )
   end
-  service "mconf-lb" do
+  service node['mconf-lb']['app_name'] do
     action :enable
   end
 else
-  template "/etc/init/mconf-lb.conf" do
+  template "/etc/init/#{node['mconf-lb']['app_name']}.conf" do
     source "upstart-script.conf.erb"
     mode 00644
     owner "root"
@@ -198,7 +208,7 @@ end
 # Monit
 include_recipe "monit-ng"
 
-template "#{node["monit"]["conf_dir"]}/mconf-lb.conf" do
+template "#{node["monit"]["conf_dir"]}/#{node['mconf-lb']['app_name']}.conf" do
   source "monit-mconf-lb.conf.erb"
   mode 00644
   owner "root"
@@ -211,7 +221,7 @@ template "#{node["monit"]["conf_dir"]}/mconf-lb.conf" do
 end
 
 # logrotate
-logrotate_app 'mconf-lb' do
+logrotate_app node['mconf-lb']['app_name'] do
   cookbook 'logrotate'
   path ["#{node['mconf-lb']['deploy_to']}/log/*.log"]
   options ['missingok', 'compress', 'copytruncate', 'notifempty', 'dateext']
@@ -251,7 +261,7 @@ if node['mconf-lb']['heartbeat']['enable']
   end
 
   # Monit configs for heartbeat
-  template "#{node["monit"]["conf_dir"]}/mconf-lb-pid.conf" do
+  template "#{node["monit"]["conf_dir"]}/#{node['mconf-lb']['app_name']}-pid.conf" do
     source "monit-mconf-lb-pid.conf.erb"
     mode 00644
     owner 'root'
@@ -259,7 +269,7 @@ if node['mconf-lb']['heartbeat']['enable']
     notifies :restart, "service[monit]", :delayed
   end
 
-  template "#{node["monit"]["conf_dir"]}/mconf-lb-heartbeat.conf" do
+  template "#{node["monit"]["conf_dir"]}/#{node['mconf-lb']['app_name']}-heartbeat.conf" do
     source "monit-mconf-lb-heartbeat.conf.erb"
     mode 00644
     owner 'root'

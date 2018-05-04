@@ -1,16 +1,16 @@
 #!monit
 set logfile /var/log/monit.log
 
-check process mconf-lb with pidfile "<%= node['mconf-lb']['pidfile'] %>"
+check process <%= node['mconf-lb']['app_name'] %> with pidfile "<%= node['mconf-lb']['pidfile'] %>"
 <% if @cycle_multiplier > 1 %>
     every <%= @cycle_multiplier %> cycles
 <% end %>
 <% if node['mconf-lb']['use_systemd'] %>
-    start program = "/bin/systemctl start mconf-lb"
-    stop program = "/bin/systemctl stop mconf-lb"
+    start program = "/bin/systemctl start <%= node['mconf-lb']['app_name'] %>"
+    stop program = "/bin/systemctl stop <%= node['mconf-lb']['app_name'] %>"
 <% else %>
-    start program = "/sbin/start mconf-lb"
-    stop program = "/sbin/stop mconf-lb"
+    start program = "/sbin/start <%= node['mconf-lb']['app_name'] %>"
+    stop program = "/sbin/stop <%= node['mconf-lb']['app_name'] %>"
 <% end %>
 
     if failed port 3000 protocol HTTP

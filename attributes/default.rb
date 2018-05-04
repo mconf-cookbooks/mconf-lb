@@ -11,6 +11,7 @@ default['mconf-lb']['user']      = node['mconf']['user'] || 'mconf'
 default['mconf-lb']['app_group'] = node['mconf']['app_group'] || 'mconf'
 
 # LB general configurations
+default['mconf-lb']['app_name']       = 'mconf-lb'
 default['mconf-lb']['domain']         = '192.168.0.100'
 default['mconf-lb']['deploy_base']    = '/var/www/mconf-lb'
 default['mconf-lb']['deploy_to']      = '/var/www/mconf-lb/current'
@@ -71,6 +72,9 @@ default['mconf-lb']['monit']['abort_on_restarts'] = 0
 default['mconf-lb']['logrotate']['frequency'] = 'daily'
 default['mconf-lb']['logrotate']['rotate']    = 90
 default['mconf-lb']['logrotate']['size']      = nil
+
+# Install / don't install nginx
+default['mconf-lb']['nginx']['enabled'] = true
 
 # logrotate options for nginx
 # by default keeps one log file per day, during ~3 months
