@@ -36,6 +36,8 @@ default['mconf-lb']['monit']['interval']          = 30 # interval between checks
 default['mconf-lb']['monit']['start_delay']       = 0 # in seconds
 # Disable alerts by default
 default['mconf-lb']['monit']['enable_alerts']     = false
+# Ping the server to check if it's running
+default['mconf-lb']['monit']['ping']              = true
 # You can set it to a single string with an email, that will receive all events,
 # or set to an object (or an array of objects) with the format:
 #
