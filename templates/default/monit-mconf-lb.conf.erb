@@ -13,7 +13,7 @@ check process <%= node['mconf-lb']['app_name'] %> with pidfile "<%= node['mconf-
     stop program = "/sbin/stop <%= node['mconf-lb']['app_name'] %>"
 <% end %>
 
-    if failed port 3000 protocol HTTP
+    if failed port <%= node['mconf-lb']['internal_port'] %> protocol HTTP
         request /ping
         with timeout 30 seconds
         then restart
@@ -23,7 +23,7 @@ check process <%= node['mconf-lb']['app_name'] %> with pidfile "<%= node['mconf-
 
     # Not the best way to do it, but the simplest. Will do the actions below twice, since they
     # are duplicates from the ones above.
-    if failed port 3000 protocol HTTP
+    if failed port <%= node['mconf-lb']['internal_port'] %> protocol HTTP
         request /ping
         with timeout 30 seconds
         then exec /bin/bash -c 'echo "[`date -u +%Y-%m-%dT%T.%3NZ`] (monit) HTTP failed, might restart it soon" >> <%= node["mconf-lb"]["deploy_to"] %>/log/production.log'

@@ -5,8 +5,8 @@ Description=Runs Mconf-LB
 Type=forking
 SyslogIdentifier=mconf-lb
 WorkingDirectory=<%= node['mconf-lb']['deploy_to'] %>
-# ExecStart=/bin/sh -c '/usr/local/bin/node app.js -l 2 -p 3000 >> <%= node['mconf-lb']['deploy_to'] %>/log/production.log 2>&1'
-ExecStart=/bin/sh -c '<%= node['mconf-lb']['deploy_to'] %>/systemd-start.sh <%= node['mconf-lb']['logfile'] %> -l 2 -p 3000 > <%= node['mconf-lb']['pidfile'] %>'
+# ExecStart=/bin/sh -c '/usr/local/bin/node app.js -l 2 >> <%= node['mconf-lb']['deploy_to'] %>/log/production.log 2>&1'
+ExecStart=/bin/sh -c '<%= node['mconf-lb']['deploy_to'] %>/systemd-start.sh <%= node['mconf-lb']['logfile'] %> -l 2 > <%= node['mconf-lb']['pidfile'] %>'
 PIDFile=<%= node['mconf-lb']['pidfile'] %>
 StandardOutput=syslog
 StandardError=syslog

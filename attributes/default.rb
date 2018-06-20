@@ -13,6 +13,7 @@ default['mconf-lb']['app_group'] = node['mconf']['app_group'] || 'mconf'
 # LB general configurations
 default['mconf-lb']['app_name']       = 'mconf-lb'
 default['mconf-lb']['domain']         = '192.168.0.100'
+default['mconf-lb']['internal_port']  = '3000'
 default['mconf-lb']['deploy_base']    = '/var/www/mconf-lb'
 default['mconf-lb']['deploy_to']      = '/var/www/mconf-lb/current'
 default['mconf-lb']['pidfile']        = '/var/www/mconf-lb/shared/mconf-lb.pid'
