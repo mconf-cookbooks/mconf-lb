@@ -58,50 +58,53 @@ if node['mconf-lb']['nginx']['enabled']
   # include_recipe "nginx"
 end
 
-# Certificates for nginx
-if node['mconf-lb']['ssl']['enable'] && node['mconf-lb']['nginx']['enabled']
-  directory node['mconf-lb']['ssl']['certificates']['path'] do
-    owner 'root'
-    group node['mconf-lb']['app-group']
-    mode 00640
-    recursive true
-    action :create
-  end
+if node['mconf-lb']['nginx']['enabled']
 
-  certs = {
-    certificate_file: nil,
-    certificate_key_file: nil
-  }
-  certs.each do |cert_name, value|
-    file = node['mconf-lb']['ssl']['certificates'][cert_name]
-    if file && file.strip != ''
-      path = "#{node['mconf-lb']['ssl']['certificates']['path']}/#{file}"
-      cookbook_file path do
-        source file
-        owner 'root'
-        group node['mconf-lb']['app-group']
-        mode 00640
-        action :create
-        notifies :restart, "service[nginx]", :delayed
-        only_if { run_context.has_cookbook_file_in_cookbook?('mconf-lb', file) }
-      end
+  # Certificates for nginx
+  if node['mconf-lb']['ssl']['enable']
+    directory node['mconf-lb']['ssl']['certificates']['path'] do
+      owner 'root'
+      group node['mconf-lb']['app-group']
+      mode 00640
+      recursive true
+      action :create
     end
-    certs[cert_name] = path
-  end
-  node.run_state['mconf-lb-certs'] = certs
 
-  # see https://gist.github.com/plentz/6737338
-  dhp_2048_file = '/etc/nginx/ssl/dhp-2048.pem'
-  execute "openssl dhparam -out #{dhp_2048_file} 2048" do
-    not_if { ::File.exists?(dhp_2048_file) }
-  end
+    certs = {
+      certificate_file: nil,
+      certificate_key_file: nil
+    }
+    certs.each do |cert_name, value|
+      file = node['mconf-lb']['ssl']['certificates'][cert_name]
+      if file && file.strip != ''
+        path = "#{node['mconf-lb']['ssl']['certificates']['path']}/#{file}"
+        cookbook_file path do
+          source file
+          owner 'root'
+          group node['mconf-lb']['app-group']
+          mode 00640
+          action :create
+          notifies :restart, "service[nginx]", :delayed
+          only_if { run_context.has_cookbook_file_in_cookbook?('mconf-lb', file) }
+        end
+      end
+      certs[cert_name] = path
+    end
+    node.run_state['mconf-lb-certs'] = certs
 
-  directory "/etc/nginx/includes" do
-    owner "root"
-    group "root"
-    mode 00755
-    action :create
-    only_if { node['mconf-lb']['nginx']['enabled'] }
+    # see https://gist.github.com/plentz/6737338
+    dhp_2048_file = '/etc/nginx/ssl/dhp-2048.pem'
+    execute "openssl dhparam -out #{dhp_2048_file} 2048" do
+      not_if { ::File.exists?(dhp_2048_file) }
+    end
+
+    directory "/etc/nginx/includes" do
+      owner "root"
+      group "root"
+      mode 00755
+      action :create
+      only_if { node['mconf-lb']['nginx']['enabled'] }
+    end
   end
 
   # remove the old include file, if it exists
@@ -140,7 +143,9 @@ if node['mconf-lb']['ssl']['enable'] && node['mconf-lb']['nginx']['enabled']
       ssl_http_api: node["mconf-lb"]["ssl"]["http_api"],
       use_custom_log: node["mconf-lb"]["nginx"]["custom_log_format"] != nil,
       certificates: node.run_state["mconf-lb-certs"],
-      cache_api: node["mconf-lb"]["nginx"]["cache_api"]
+      cache_api: node["mconf-lb"]["nginx"]["cache_api"],
+      certbot: node["mconf-lb"]["nginx"]["certbot"]["enable"],
+      certbot_root: node["mconf-lb"]["nginx"]["certbot"]["root"]
     })
     notifies :restart, "service[nginx]", :delayed
     only_if { node['mconf-lb']['nginx']['enabled'] }
@@ -176,9 +181,7 @@ if node['mconf-lb']['ssl']['enable'] && node['mconf-lb']['nginx']['enabled']
     EOF
     only_if { node['mconf-lb']['nginx']['enabled'] }
   end
-
 end
-
 
 # Service
 # Note: we don't use a "service mconf-lb" here because the application is started

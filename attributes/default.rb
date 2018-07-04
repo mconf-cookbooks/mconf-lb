@@ -88,6 +88,9 @@ default['mconf-lb']['nginx']['logrotate']['size']      = nil
 default['mconf-lb']['nginx']['custom_log_format']      = nil
 # cache api calls?
 default['mconf-lb']['nginx']['cache_api']              = true
+# serve the ACME challenge for certbot?
+default['mconf-lb']['nginx']['certbot']['enable']      = false
+default['mconf-lb']['nginx']['certbot']['root']        = '/var/www/.well-known/acme-challenge/'
 
 # Heartbeat
 default['mconf-lb']['heartbeat']['enable'] = false

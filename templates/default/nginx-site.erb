@@ -41,14 +41,20 @@ server {
     add_header Content-Type text/plain;
   }
 
+<% if @certbot %>
+  location ^~ /.well-known/acme-challenge/ {
+    alias <%= @certbot_root %>;
+  }
+<% end %>
+
 <% if @ssl %>
   <% if @ssl_http_api %>
     <% if @cache_api %>
-  include "/etc/nginx/includes/mconf-lb-api-cache.conf";
+      include "/etc/nginx/includes/mconf-lb-api-cache.conf";
     <% end %>
-  location /bigbluebutton/api {
+    location /bigbluebutton/api {
     include "/etc/nginx/includes/mconf-lb-node.conf";
-  }
+    }
   <% end %>
 
   # all other routes are redirected to HTTPS
