@@ -36,6 +36,11 @@ server {
   listen 80;
   server_name <%= @domain %>;
 
+  location = /ping {
+    return 200 'pong';
+    add_header Content-Type text/plain;
+  }
+
 <% if @ssl %>
   <% if @ssl_http_api %>
     <% if @cache_api %>
@@ -98,6 +103,11 @@ server {
 
   server_name <%= @domain %>;
   root <%= @deploy_to %>/public;
+
+  location = /ping {
+    return 200 'pong';
+    add_header Content-Type text/plain;
+  }
 
   gzip on;
   gzip_disable "msie6";
