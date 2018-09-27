@@ -211,6 +211,12 @@ end
 
 # Monit
 include_recipe "monit-ng"
+# temporary fix for https://bugs.launchpad.net/ubuntu/+source/monit/+bug/1786910
+package 'Force monit 1:5.16-2' do
+  package_name 'monit'
+  version '1:5.16-2'
+  options '--allow-downgrades'
+end
 
 template "#{node["monit"]["conf_dir"]}/#{node['mconf-lb']['app_name']}.conf" do
   source "monit-mconf-lb.conf.erb"
