@@ -211,11 +211,17 @@ end
 
 # Monit
 include_recipe "monit-ng"
+
 # temporary fix for https://bugs.launchpad.net/ubuntu/+source/monit/+bug/1786910
 package 'Force monit 1:5.16-2' do
   package_name 'monit'
   version '1:5.16-2'
   options '--allow-downgrades'
+  only_if { node['platform'] == 'ubuntu' && Gem::Version.new(node['platform_version']) >= Gem::Version.new('16.04') }
+end
+
+service 'monit' do
+  action [ :enable, :start ]
 end
 
 template "#{node["monit"]["conf_dir"]}/#{node['mconf-lb']['app_name']}.conf" do
