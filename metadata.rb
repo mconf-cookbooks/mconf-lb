@@ -26,6 +26,9 @@ depends  'monit-ng', '~> 2.3'
 depends  'logrotate', '~> 1.9'
 depends  'apt', '>= 2.9'
 
+# to prevent issues with chef 12
+depends  'seven_zip', '~> 3.0.0'
+
 # TODO: update to 3.0 when done, 2.x is old
 depends  'nginx', '~> 2.7'
 
