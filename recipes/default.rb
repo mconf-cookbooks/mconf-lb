@@ -208,32 +208,25 @@ else
   end
 end
 
+# Monit. On ubuntu >= 16.04 we use systemd.
+unless (node['platform'] == 'ubuntu' && Gem::Version.new(node['platform_version']) >= Gem::Version.new('16.04'))
+  include_recipe "monit-ng"
 
-# Monit
-include_recipe "monit-ng"
+  service 'monit' do
+    action [ :enable, :start ]
+  end
 
-# temporary fix for https://bugs.launchpad.net/ubuntu/+source/monit/+bug/1786910
-package 'Force monit 1:5.16-2' do
-  package_name 'monit'
-  version '1:5.16-2'
-  options '--allow-downgrades'
-  only_if { node['platform'] == 'ubuntu' && Gem::Version.new(node['platform_version']) >= Gem::Version.new('16.04') }
-end
-
-service 'monit' do
-  action [ :enable, :start ]
-end
-
-template "#{node["monit"]["conf_dir"]}/#{node['mconf-lb']['app_name']}.conf" do
-  source "monit-mconf-lb.conf.erb"
-  mode 00644
-  owner "root"
-  group "root"
-  variables(
-    cycle_multiplier: node['mconf-lb']['heartbeat']['enable'] ? 60 : 1,
-    abort_on_restarts: node['mconf-lb']['monit']['abort_on_restarts']
-  )
-  notifies :restart, "service[monit]", :delayed
+  template "#{node["monit"]["conf_dir"]}/#{node['mconf-lb']['app_name']}.conf" do
+    source "monit-mconf-lb.conf.erb"
+    mode 00644
+    owner "root"
+    group "root"
+    variables(
+      cycle_multiplier: node['mconf-lb']['heartbeat']['enable'] ? 60 : 1,
+      abort_on_restarts: node['mconf-lb']['monit']['abort_on_restarts']
+    )
+    notifies :restart, "service[monit]", :delayed
+  end
 end
 
 # logrotate
