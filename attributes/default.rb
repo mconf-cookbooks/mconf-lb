@@ -91,6 +91,14 @@ default['mconf-lb']['nginx']['cache_api']              = true
 # serve the ACME challenge for certbot?
 default['mconf-lb']['nginx']['certbot']['enable']      = false
 default['mconf-lb']['nginx']['certbot']['root']        = '/var/www/.well-known/acme-challenge/'
+default['mconf-lb']['nginx']['api_cache'] = [
+  ["= /bigbluebutton/api", "60m"],
+  ["/bigbluebutton/api/isMeetingRunning", "30s"],
+  ["/bigbluebutton/api/getMeetingInfo", "5s"],
+  ["/bigbluebutton/api/getDefaultConfigXML", "60m"],
+  ["/bigbluebutton/api/getMeetings", "5s"],
+  ["/bigbluebutton/api/getRecordings", "2m"]
+]
 
 # Heartbeat
 default['mconf-lb']['heartbeat']['enable'] = false

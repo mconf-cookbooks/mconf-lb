@@ -1,42 +1,9 @@
-location = /bigbluebutton/api {
+<% node['mconf-lb']['nginx']['api_cache'].each do |item| %>
+location <%= item[0] %> {
   proxy_cache api;
-  proxy_cache_valid 200 60m;
+  proxy_cache_valid 200 <%= item[1] %>;
   proxy_ignore_headers "Set-Cookie";
   proxy_hide_header "Set-Cookie";
   include "/etc/nginx/includes/mconf-lb-node.conf";
 }
-location /bigbluebutton/api/isMeetingRunning {
-  proxy_cache api;
-  proxy_cache_valid 200 30s;
-  proxy_ignore_headers "Set-Cookie";
-  proxy_hide_header "Set-Cookie";
-  include "/etc/nginx/includes/mconf-lb-node.conf";
-}
-location /bigbluebutton/api/getMeetingInfo {
-  proxy_cache api;
-  proxy_cache_valid 200 5s;
-  proxy_ignore_headers "Set-Cookie";
-  proxy_hide_header "Set-Cookie";
-  include "/etc/nginx/includes/mconf-lb-node.conf";
-}
-location /bigbluebutton/api/getDefaultConfigXML {
-  proxy_cache api;
-  proxy_cache_valid 200 60m;
-  proxy_ignore_headers "Set-Cookie";
-  proxy_hide_header "Set-Cookie";
-  include "/etc/nginx/includes/mconf-lb-node.conf";
-}
-location /bigbluebutton/api/getMeetings {
-  proxy_cache api;
-  proxy_cache_valid 200 5s;
-  proxy_ignore_headers "Set-Cookie";
-  proxy_hide_header "Set-Cookie";
-  include "/etc/nginx/includes/mconf-lb-node.conf";
-}
-location /bigbluebutton/api/getRecordings {
-  proxy_cache api;
-  proxy_cache_valid 200 2m;
-  proxy_ignore_headers "Set-Cookie";
-  proxy_hide_header "Set-Cookie";
-  include "/etc/nginx/includes/mconf-lb-node.conf";
-}
+<% end %>
